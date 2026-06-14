@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career-MBTI 职业人格测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .welcome-page {
+            text-align: center;
+            padding: 80px 20px;
+        }
+        
+        .welcome-title {
+            font-size: 56px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 50px;
+            letter-spacing: 2px;
+        }
+        
+        .start-btn {
+            padding: 18px 60px;
+            font-size: 20px;
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+        
+        .quiz-page {
+            background: white;
+            border-radius: 20px;
+            padding: 50px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+        
+        .progress-text {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+        
+        .question-text {
+            font-size: 20px;
+            line-height: 1.8;
+            color: #2c3e50;
+            margin-bottom: 40px;
+            text-align: center;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        
+        .option-btn {
+            padding: 16px 24px;
+            font-size: 16px;
+            color: #34495e;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin: 8px 0;
+            text-align: center;
+        }
+        
+        .option-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .result-page {
+            background: white;
+            border-radius: 20px;
+            padding: 50px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+        
+        .result-code {
+            font-size: 64px;
+            font-weight: 700;
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .result-name {
+            font-size: 28px;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 40px;
+            font-weight: 500;
+        }
+        
+        .jobs-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .job-tag {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            border: none;
+        }
+        
+        .job-tag:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .restart-btn {
+            display: block;
+            margin: 50px auto 0;
+            padding: 14px 40px;
+            font-size: 16px;
+            color: #667eea;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .restart-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #ecf0f1;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            color: #7f8c8d;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-close:hover {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-right: 40px;
+        }
+        
+        .modal-section {
+            margin-bottom: 25px;
+        }
+        
+        .modal-section h3 {
+            font-size: 18px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .modal-section p {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #34495e;
+        }
+        
+        .modal-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .modal-section li {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #34495e;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .modal-section li:before {
+            content: "•";
+            color: #667eea;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .welcome-title {
+                font-size: 36px;
+            }
+            
+            .quiz-page, .result-page {
+                padding: 30px 20px;
+            }
+            
+            .question-text {
+                font-size: 18px;
+            }
+            
+            .result-code {
+                font-size: 48px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="welcomePage" class="page active">
+            <div class="welcome-page">
+                <h1 class="welcome-title">Career-MBTI</h1>
+                <button class="start-btn" onclick="startTest()">开始测试</button>
+            </div>
+        </div>
+        
+        <div id="quizPage" class="page">
+            <div class="quiz-page">
+                <div class="progress-text">
+                    第 <span id="currentQuestion">1</span> / 24 题
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill" style="width: 4.17%"></div>
+                </div>
+                <div class="question-text" id="questionText"></div>
+                <div id="optionsContainer"></div>
+            </div>
+        </div>
+        
+        <div id="resultPage" class="page">
+            <div class="result-page">
+                <div class="result-code" id="resultCode"></div>
+                <div class="result-name" id="resultName"></div>
+                <div class="jobs-container" id="jobsContainer"></div>
+                <button class="restart-btn" onclick="restartTest()">重新测试</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <h2 class="modal-title" id="modalTitle"></h2>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+    
+    <script src="job-details.js"></script>
+    
+    <script>
+        // 问卷题目
+        const questions = [
+            "面对一个具体可触摸的问题，比如损坏的家具或操作复杂的工具，我更倾向于亲手拆解、组装和调试，享受那种\"实物在我手中变得听话\"的感觉。",
+            "花一个下午独自在脑海中推演一个抽象概念或逻辑链条，比如思考\"为何某种经济现象会发生\"或\"数学定理的内在美感\"，对我而言是极有吸引力的精神活动。",
+            "一个创意闪现时，无论是通过写作、涂鸦、即兴哼唱还是用身体表达，我迫切希望立即用某种独特形式把它捕捉并呈现出来，这比最终成品是否完美更重要。",
+            "当朋友陷入情绪低谷或生活瓶颈时，我总会被一种本能牵引，想去倾听、去共情，并在对方允许下，通过对话慢慢帮他看清内心的雾霭。",
+            "在一群人中，我自然会对局面进行评估，乐于提出方向、分配角色并推动大家迅速行动，我相信良性竞争与目标导向能让事情更好。",
+            "使用系统化的流程处理信息让我满足。为混乱的数据、文档或日程建立清晰精确的体系，并按规则核对与维护，这本身就是一种秩序的美感。",
+            "忙碌一天后，我最理想的充电方式是一个人安静地反思消化、沉浸于个人兴趣或仅仅享受不被打扰的独处时光。",
+            "在高质量的社交或小组头脑风暴中，我感觉自己像一块海绵扔进了水里，不断吸收新角度，离开时能量往往比来时更高昂。",
+            "我的最佳思考往往通过\"说出来\"完成，需要身边有回应的耳朵或搭档，独自闭门苦思反而容易让想法枯竭或胶着。",
+            "投入一个需要深度专注的长期项目时，我倾向于拥有不被打断的整块时间和私密空间，过多中途交谈会让我能量涣散。",
+            "面对陌生环境，我更像一个观察者，先花时间感知情境，等确认了少数深度连结的人后，才会逐渐展开交流。",
+            "\"朋友形容我是一个容易接近的人，大多数时候我乐意主动发起闲聊、介绍自己或组织聚会，社交网络构成我生活的广阔脉络。",
+            "做出重大选择时，我的第一反应是列出利弊清单，权衡客观标准与效率。若一个方案逻辑上最正确，即使可能让部分人不快，我仍倾向执行。",
+            "看到某个流程或规则在执行中让身边人感到委屈或不适，我内心会一直悬挂此事，并本能思考如何在不伤人的前提下做出调整。",
+            "进行争论时，我更享受基于事实和严密论证的交锋，认为\"谁对\"比\"谁感觉好\"重要，真理越辩越明。",
+            "一个决定即便逻辑上无懈可击，但如果它违背了我内心看重的价值观或伤害了团队情感氛围，我最终很难真正认同它。",
+            "对于优异者的评判，我脑中自然采用明确统一的原则性标尺，达成即是达成，不会因为对方的个人故事或关系轻易调松准线。",
+            "当团队面临选择，我习惯先感知每个人微妙的态度与需求，努力寻找一个能尽量让各方内心认可、关系得以维系的方向。",
+            "开始任何项目前，制定明确步骤与分阶段截止日能让我彻底安心，看到待办清单上被勾掉的条目如同卸下重担。",
+            "保持选择的开放空间对我至关重要。过早确定某一路径会让我有压迫感，我喜欢感觉\"一切皆有可能\"，可以随着新信息涌现转向。",
+            "生活和工作中，我会主动构造稳定的常规，比如固定的整理时间、记账或保养程序，秩序一旦建立，我很少主动打破它。",
+            "面对一个任务，截止日期更像一个节奏参考而非指令，如果我在过程中发现了更值得探索的旁支，我倾向于延展并修正原先路径。",
+            "我对\"悬而未决\"耐受力较低，不管是书架的分类还是小组的结论，我总是那个希望尽快理清，拿出最终方案的人。",
+            "惊喜与意外插入的生活插曲通常能给我注入活力，我感觉适应和随性变通是种自信，而非被动无奈。"
+        ];
+        
+        // 48种职业人格代码与中文名称
+        const typeNames = {
+            "RETJ": "现场应变指挥官", "RETP": "敏捷构建探险家", "REFJ": "安全训导师", "REFP": "手艺即兴诗人",
+            "RITJ": "精密鉴定师", "RITP": "独立技术实验家", "RIFJ": "沉默守护匠人", "RIFP": "手艺隐士",
+            "IETJ": "前瞻架构师", "IETP": "思想辩论探索者", "IEFJ": "知识传播教士", "IEFP": "人文哲思漫游者",
+            "IITJ": "深度理论家", "IITP": "自主实验家", "IIFJ": "沉静洞察顾问", "IIFP": "人文洞察者",
+            "AETJ": "创意制作人", "AETP": "跨界创意实验家", "AEFJ": "共情叙事疗愈师", "AEFP": "即兴感染力",
+            "AITJ": "美学结构建筑师", "AITP": "实验性思想家艺术家", "AIFJ": "内向型艺术治疗师", "AIFP": "静默的诗人",
+            "SETJ": "教育系统建筑师", "SETP": "多元融合外交家", "SEFJ": "社群温暖编织者", "SEFP": "社群点燃者",
+            "SITJ": "学习系统设计师", "SITP": "一对一深度催化师", "SIFJ": "静默守望者", "SIFP": "灵魂共鸣同行者",
+            "EETJ": "使命统帅", "EETP": "机会狩猎战略家", "EEFJ": "团队激情点燃者", "EEFP": "激励演讲家",
+            "EITJ": "幕后战略投资者", "EITP": "独立交易架构师", "EIFJ": "价值观布道者", "EIFP": "内向型说服家",
+            "CETJ": "运营铁腕管家", "CETP": "弹性流程优化师", "CEFJ": "客户体验守护者", "CEFP": "亲切的服务流",
+            "CITJ": "秩序审计官", "CITP": "数据侦探", "CIFJ": "档案人文记录者", "CIFP": "细节美学家"
+        };
+        
+        // 岗位匹配库
+        const jobLists = {
+            "RETJ": ["应急救援队队长", "施工员", "安全员", "监理工程师", "爆破工", "塔吊司机/指挥", "钢结构安装承包负责人", "路桥施工员", "隧道工", "矿山工", "井下作业工"],
+            "RETP": ["深海潜水作业技术员", "货运司机", "挖掘机司机", "装载机司机", "铲车司机", "推土机司机", "压路机司机", "平地机司机", "摊铺机司机", "泵车司机", "船员/水手"],
+            "REFJ": ["消防训练教官", "职业健康安全主管", "体育体能教练", "警用战术培训师", "工业安全巡检员", "高空作业培训师", "健身教练", "瑜伽教练", "台球教练", "架子工班组长", "爬架/提升架负责人"],
+            "REFP": ["定制摩托车改装师", "独立木工坊主理人", "金工首饰匠人", "建筑修复手工艺人", "街头即兴雕塑艺人", "皮革手工皮具师", "焊工", "铆工", "钳工", "机修工", "家电维修", "手机维修", "开锁师傅", "管道疏通"],
+            "RITJ": ["珠宝鉴定师", "精密仪器校准师", "法医痕迹检验技术员", "无损检测工程师", "钟表修复师", "食品质检实验室主管", "质量管理员", "质检员", "测量员", "化验员", "验光师", "材料员"],
+            "RITP": ["3D打印原型师", "独立发明家", "生物黑客实验室运营者", "机器人竞赛战队导师", "可持续能源实验站负责人", "极客创客空间技术顾问", "嵌入式开发工程师", "硬件工程师", "电路设计工程师", "PCB设计工程师", "射频工程师", "FPGA开发工程师", "自动化工程师", "机电工程师"],
+            "RIFJ": ["乐器制作与调律师", "文物保护修复师", "历史建筑维护工匠", "墓园与纪念碑维护师", "馆藏标本制作师", "传统酿造技艺传承人", "古建筑工", "彩绘工", "壁画师", "墙绘师", "石材翻新", "防水工", "防腐工"],
+            "RIFP": ["手工造纸传承人", "独立农场主", "山林手工烧窑陶艺师", "自给自足式有机种植者", "羊毛纺线染色独立匠人", "隐居型木船建造师", "木工", "泥瓦工", "钢筋工", "油漆工", "水电工", "混凝土工", "装配式构件安装"],
+            "IETJ": ["人工智能算法架构师", "首席技术官", "航天任务轨道设计主管", "新药研发项目总监", "半导体芯片设计团队负责人", "金融风控模型架构师", "技术总监", "架构师", "技术经理", "数据架构师", "算法团队负责人", "通信研发工程师"],
+            "IETP": ["理论物理前沿探索者", "科学专栏评论家", "智库政策辩论研究员", "哲学教授", "独立科技趋势分析师", "复杂科学跨学科联络人", "市场调研分析师", "企业管理咨询顾问", "证券分析师", "投资分析师", "数据运营分析师", "战略咨询顾问"],
+            "IEFJ": ["科学博物馆策展人", "科普纪录片制片人", "学术期刊主编", "天文馆教育总监", "知识付费领域科普讲师", "高校通识教育改革推动者", "培训师", "学科教师", "科普内容创作者", "技术写作/文档工程师", "主编/副主编", "医学编辑"],
+            "IEFP": ["独立哲学写作者", "文化人类学田野调研员", "深度访谈类播客主理人", "存在主义心理咨询师", "思想史翻译者", "宗教比较研究独立学者", "心理咨询师", "法律咨询顾问", "笔译", "文字编辑", "剧本杀主持人", "用户研究员"],
+            "IITJ": ["理论数学家", "密码学基础研究员", "高能物理数据分析师", "演化生物学理论构建者", "认知科学基础研究教授", "宏观经济学模型构建师", "算法工程师", "机器学习工程师", "深度学习工程师", "自然语言处理工程师", "计算机视觉工程师", "推荐算法工程师", "语音识别工程师"],
+            "IITP": ["独立实验室创始人", "开源软件核心贡献者", "业余天文学家", "生物信息学自由研究员", "独立游戏引擎开发者", "神经网络黑箱探索者", "数据开发工程师", "ETL工程师", "爬虫工程师", "数据仓库工程师", "后端开发", "软件测试工程师"],
+            "IIFJ": ["战略情报分析师", "物证鉴定中心高级顾问", "医学影像诊断专家", "古文献版本鉴定学者", "独立法务证据顾问", "历史气候重建研究员", "数据分析师", "风控专员", "审计师", "法务专员", "知识产权律师", "合规专员"],
+            "IIFP": ["文学批评家", "心理传记写作者", "符号学与品牌深层解读顾问", "文化心理学期刊编辑", "独立神话原型研究者", "人类梦境与叙事分析学者", "心理咨询师", "用户研究/交互设计研究员", "医学编辑", "文字编辑", "笔译", "游戏策划"],
+            "AETJ": ["电影制片人", "时装周秀场总监", "大型沉浸式展览总策划", "游戏制作人", "音乐节总导演", "广告创意总监", "编导", "主编", "游戏策划", "新媒体运营主管", "内容运营主管", "短视频运营主管", "创意总监"],
+            "AETP": ["新媒体艺术团队创始人", "声音与交互装置艺术家", "虚拟现实叙事实验导演", "生物艺术跨界创作者", "生成式人工智能艺术探索者", "城市介入艺术策划人", "UI/UX设计师", "视觉设计师", "交互设计师", "游戏设计师", "新媒体运营", "短视频运营", "文案策划"],
+            "AEFJ": ["戏剧治疗师", "儿童生命教育绘本作家", "安宁疗护叙事辅导员", "青少年创意写作营带领者", "公益纪录片导演", "社区口述史剧场导演", "戏剧治疗/应用戏剧引导者", "儿童教育类内容创作者", "绘本创作者", "纪录片编导", "剧本杀主持人", "社区活动策划"],
+            "AEFP": ["即兴喜剧演员", "应用戏剧工作坊引导师", "街头音乐表演艺人", "生活美学短视频博主", "亲子肢体互动课带领者", "快闪合唱发起人", "主播", "直播电商主播", "剧本杀主持人", "短视频出镜达人", "礼仪/模特", "声乐老师", "器乐老师"],
+            "AITJ": ["建筑外观概念设计师", "字体设计师", "工业设计美学总监", "舞台空间视觉架构师", "园林景观规划师", "奢侈品视觉陈列主管", "UI设计师", "平面设计师", "工业设计师", "室内设计师", "建筑设计师", "游戏美术设计师", "视频剪辑师"],
+            "AITP": ["算法生成艺术创作者", "声音景观装置设计师", "科幻概念设定艺术家", "实验电影导演", "数据叙事可视化先锋", "思辨设计实践者", "概念设计师", "摄像师", "视觉设计", "独立游戏制作人", "新媒体艺术创作者"],
+            "AIFJ": ["注册艺术治疗师", "特殊儿童美术教育者", "成人涂鸦日记课程导师", "正念陶艺静修营带领者", "丧亲艺术疗愈支持小组协调员", "精神康复中心绘画治疗师", "美术老师", "书法老师", "舞蹈老师", "音乐老师", "早教老师", "幼教", "康复治疗师"],
+            "AIFP": ["独立插画师", "纯艺油画家", "独立民谣音乐创作人", "私人日记体作家", "诗意摄影独立出版人", "独处式自然录音艺术家", "插画师", "平面设计", "摄像师", "文案策划", "音乐创作人", "文字编辑"],
+            "SETJ": ["学校课程体系设计总监", "教育培训机构教学副校长", "教育政策研究员", "企业大学校长", "青少年发展项目总规划师", "国家课程改革专家组成员", "教育行政管理者", "培训师", "课程研发主管", "教务管理", "幼教园长", "教育产品经理"],
+            "SETP": ["非营利组织跨文化项目经理", "企业多元化与包容性总监", "国际难民事务协调员", "社区冲突调解与对话主持人", "跨国公司本地化社区关系官", "国际发展援助项目代表", "项目经理", "项目主管", "实施工程师", "客户成功经理", "售前技术支持", "外贸销售", "跨境电商运营"],
+            "SEFJ": ["社区中心主理人", "临终关怀安宁陪护师", "老年活动社群运营官", "妇女互助小组创始协调人", "邻里食物银行组织者", "孤寡老人陪伴项目主管", "客服主管", "民宿管家", "物业管理员", "社区运营", "用户运营", "酒店前台/客房经理"],
+            "SEFP": ["青年社会组织创始人", "社区花园共建发起人", "创意市集与节日庆典策划人", "基层民主议事工作坊主持", "公益徒步筹款活动领队", "互助育儿圈核心组织者", "活动运营", "新媒体运营", "用户运营", "商家运营", "内容运营", "直播运营", "剧本杀主持人"],
+            "SITJ": ["在线教育学习体验设计师", "特殊教育个训方案研发", "教育科技产品经理", "素养评估量规制定专家", "职业技能等级认证体系开发", "博物馆儿童教育项目设计师", "教育产品经理", "在线课程设计师", "特殊教育教师", "培训课程开发", "学习体验设计师", "教育技术专员"],
+            "SITP": ["生涯规划咨询师", "高管一对一教练", "青少年成长导师", "成瘾戒断个人恢复顾问", "司法矫正领域个案辅导员", "天才儿童个别化教育导师", "心理咨询师", "教练", "家教", "法律顾问", "理财顾问", "保险顾问"],
+            "SIFJ": ["安宁疗护护士", "特殊教育学校班主任", "长期慢性病患支持个案管理师", "儿童福利院资深保育员", "戒毒所夜间值守心理支持", "失智老人照护专员", "护士", "康复师", "理疗师", "药剂师", "特殊教育教师", "月嫂/育儿嫂", "保姆", "养老护理员"],
+            "SIFP": ["人本主义心理咨询师", "灵性陪伴导师", "夫妻关系深度辅导员", "哀伤辅导专员", "个人成长静修营一对一陪伴者", "存在主义心理治疗实践者", "心理咨询师", "临终关怀工作者", "婚姻家庭咨询师", "个人成长陪伴导师", "精神康复社工"],
+            "EETJ": ["私募股权基金执行合伙人", "创业公司创始人兼首席执行官", "变革型组织总裁", "军事战略指挥官", "连锁品牌总操盘人", "大型工程项目总指挥", "总裁/总经理/CEO", "副总裁/副总经理", "分公司/办事处经理", "总监", "店长", "餐饮经理", "销售经理"],
+            "EETP": ["风险投资人", "商业地产并购操盘手", "新市场开拓业务副总裁", "赛事版权交易谈判官", "独立企业并购顾问", "大宗商品交易策略师", "投资经理", "证券交易员", "投融资经理", "商业地产/房产投资", "金融销售", "渠道销售", "跨境电商运营"],
+            "EEFJ": ["销售团队激励总监", "企业文化与价值观传播官", "直销团队精神领袖", "运动队心理能量教练", "餐饮连锁门店营运鼓舞师", "保险精英团队区域总监", "销售经理", "客服主管", "运营总监", "保险团队主管", "酒店/餐饮经理", "健身教练主管", "企业文化负责人"],
+            "EEFP": ["职业励志演讲家", "众筹项目路演专家", "高情商销售先锋", "个人品牌与影响力教练", "直播带货情绪价值主播", "活动开场主旨演讲嘉宾", "销售代表", "金融销售", "房产销售", "汽车销售", "保险销售", "主播", "培训师"],
+            "EITJ": ["对冲基金分析师", "家族办公室投资总监", "战略咨询公司合伙人", "私募股权投后管理专家", "棋牌类竞技策略教练", "商业竞争情报总监", "投资分析师", "风控总监", "财务经理/CFO", "战略规划总监", "高级产品经理", "商业分析经理", "并购顾问"],
+            "EITP": ["独立交易员", "加密货币去中心化自治组织发起人", "大宗商品套利策略设计师", "扑克职业玩家", "独立天使投资人", "数字资产投资组合经理", "独立投资人", "量化交易员", "期货交易员", "外汇交易员", "独立投融资顾问", "私募基金经理", "数字货币交易员"],
+            "EIFJ": ["社会企业创始人", "公平贸易品牌总监", "影响力投资基金经理", "共益企业认证推动官", "企业社会责任首席代表", "伦理消费倡导运动领袖", "企业社会责任负责人", "法律顾问", "教育机构创始人", "环保/可持续发展项目经理", "公益基金会项目官"],
+            "EIFP": ["精品投行高级顾问", "高端艺术品私人经销商", "家族信托规划师", "品牌故事叙事顾问", "低调型私募募资合伙人", "深度信任型大客户经理", "理财顾问", "保险顾问", "法律顾问", "知识产权律师", "高端房产经纪人", "艺术品/藏品经纪人"],
+            "CETJ": ["首席运营官", "供应链管理总监", "大型赛事活动统筹指挥", "航空地勤运营经理", "五星级酒店驻店经理", "军队后勤保障总调度", "运营总监", "行政经理", "项目主管", "物流经理", "仓储经理", "施工项目经理", "生产主管"],
+            "CETP": ["精益生产管理顾问", "应急物流调度专家", "企业资源规划系统实施顾问", "多式联运方案设计师", "弹性用工排班系统规划师", "灾难应急物资调配师", "运营专员", "物流专员", "供应链优化专员", "仓库管理员", "ERP实施顾问", "配送站长", "调度员"],
+            "CEFJ": ["医疗行政患者体验官", "高端酒店金钥匙礼宾司", "航空公司贵宾服务主管", "金融机构高净值客户关系经理", "私人银行客户服务总监", "会员制度假村体验经理", "客服专员", "行政专员/助理", "酒店前台", "民宿管家", "导诊/医导", "签证专员", "客户成功经理"],
+            "CEFP": ["行政前台与访客体验专员", "社区医院导诊咨询台主管", "保险理赔客户关怀顾问", "政务服务大厅综合窗口专员", "商场客户服务台暖心接待", "呼叫中心共情型客服组长", "客服专员", "收银员", "服务员", "行政专员/助理", "运营助理", "计调员", "配送员"],
+            "CITJ": ["精算师", "四大会计师事务所审计经理", "合规与反洗钱总监", "司法鉴定财务会计专家", "药品生产质量管理规范审核官", "信息安全等级保护测评师", "会计", "审计师", "税务专员", "出纳", "法务专员", "风控专员", "质检员", "材料员"],
+            "CITP": ["法务会计欺诈调查师", "网络犯罪数字取证专家", "商业尽职调查研究员", "开放源情报分析师", "学术不端数据审查员", "保险欺诈调查专员", "数据分析师", "审计师", "法务会计", "信息审核员", "测试工程师", "功能测试工程师", "网络工程师"],
+            "CIFJ": ["档案管理局编研处处长", "地方志编纂学者", "家谱族谱修复与研究员", "口述历史项目档案主管", "医学病历档案管理专家", "图书馆特藏文献保护员", "档案管理员", "图书馆员", "文字编辑", "医学编辑", "法务专员", "行政专员", "知识库管理员"],
+            "CIFP": ["古籍修复师", "花艺设计师", "文具与手帐产品测评顾问", "博物馆藏品管理员", "高级定制西装裁缝", "茶道与香道器物整理师", "花艺师", "美甲师", "化妆师", "美容师", "美发师", "面点师", "配菜/打荷", "瓷砖美缝"]
+        };
+        
+        // 全局变量
+        let currentQuestion = 0;
+        let answers = [];
+        
+        // 开始测试
+        function startTest() {
+            currentQuestion = 0;
+            answers = [];
+            showPage('quizPage');
+            displayQuestion();
+        }
+        
+        // 显示页面
+        function showPage(pageId) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+        
+        // 显示题目
+        function displayQuestion() {
+            document.getElementById('currentQuestion').textContent = currentQuestion + 1;
+            const progress = ((currentQuestion + 1) / 24 * 100).toFixed(2);
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('questionText').textContent = (currentQuestion + 1) + '. ' + questions[currentQuestion];
+            
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+            
+            const options = ['基本没有 · 1分', '有一点 · 2分', '较多时候 · 3分', '非常多时候 · 4分', '几乎完全 · 5分'];
+            options.forEach((text, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = text;
+                btn.onclick = () => selectOption(index + 1);
+                container.appendChild(btn);
+            });
+        }
+        
+        // 选择选项
+        function selectOption(score) {
+            answers.push(score);
+            if (currentQuestion < 23) {
+                currentQuestion++;
+                displayQuestion();
+            } else {
+                calculateResult();
+            }
+        }
+        
+        // 计算结果
+        function calculateResult() {
+            const s = answers;
+            
+            // 第一位字母（兴趣核心）
+            const r = [s[0], s[1], s[2], s[3], s[4], s[5]];
+            const m = Math.max(...r);
+            const p = ['R', 'I', 'A', 'S', 'E', 'C'];
+            let first = 'R';
+            for (let i = 0; i < 6; i++) {
+                if (r[i] === m) {
+                    first = p[i];
+                    break;
+                }
+            }
+            
+            // 第二位字母（能量取向）
+            const e = s[7] + s[8] + s[11];
+            const ie = s[6] + s[9] + s[10];
+            const second = e > ie ? 'E' : 'I';
+            
+            // 第三位字母（决策依据）
+            const t = s[12] + s[14] + s[16];
+            const f = s[13] + s[15] + s[17];
+            const third = t > f ? 'T' : 'F';
+            
+            // 第四位字母（行动模式）
+            const j = s[18] + s[20] + s[22];
+            const p2 = s[19] + s[21] + s[23];
+            const fourth = j > p2 ? 'J' : 'P';
+            
+            const code = first + second + third + fourth;
+            
+            document.getElementById('resultCode').textContent = code;
+            document.getElementById('resultName').textContent = typeNames[code] || '未知类型';
+            
+            const jobs = jobLists[code] || [];
+            const container = document.getElementById('jobsContainer');
+            container.innerHTML = '';
+            
+            if (jobs.length > 0) {
+                const title = document.createElement('h3');
+                title.style.cssText = 'width: 100%; text-align: center; color: #2c3e50; margin-bottom: 20px;';
+                title.textContent = '推荐岗位';
+                container.appendChild(title);
+                
+                jobs.forEach(job => {
+                    const tag = document.createElement('button');
+                    tag.className = 'job-tag';
+                    tag.textContent = job;
+                    tag.onclick = () => showJobDetail(job);
+                    container.appendChild(tag);
+                });
+            }
+            
+            showPage('resultPage');
+        }
+        
+        // 显示岗位详情
+        function showJobDetail(jobName) {
+            const modal = document.getElementById('modalOverlay');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+            
+            title.textContent = jobName;
+            
+            // 检查是否有岗位详情数据
+            if (typeof jobDetails !== 'undefined' && jobDetails[jobName]) {
+                const detail = jobDetails[jobName];
+                body.innerHTML = `
+                    <div class="modal-section">
+                        <h3>📋 岗位介绍</h3>
+                        <p>${detail.intro}</p>
+                    </div>
+                    <div class="modal-section">
+                        <h3>💰 最新薪资</h3>
+                        <p>${detail.salary}</p>
+                    </div>
+                    <div class="modal-section">
+                        <h3>✅ 具体要求</h3>
+                        <ul>
+                            ${detail.requirements.map(req => `<li>${req}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            } else {
+                body.innerHTML = `
+                    <div class="modal-section">
+                        <h3>📋 岗位介绍</h3>
+                        <p>该岗位的详细介绍信息正在完善中...</p>
+                    </div>
+                    <div class="modal-section">
+                        <h3>💰 最新薪资</h3>
+                        <p>薪资信息正在完善中...</p>
+                    </div>
+                    <div class="modal-section">
+                        <h3>✅ 具体要求</h3>
+                        <ul>
+                            <li>具体要求正在完善中...</li>
+                        </ul>
+                    </div>
+                    <div class="modal-section" style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 12px;">
+                        <p style="font-size: 14px; color: #7f8c8d; text-align: center;">
+                            💡 提示：完整的岗位详情数据包含超过480个岗位的详细信息。<br>
+                            由于数据量极大，完整版需要将岗位详情数据嵌入到 jobDetails 对象中。<br><br>
+                            目前显示的岗位名称来自 jobLists 对象，<br>
+                            完整的岗位介绍、薪资和要求需要补充 jobDetails 对象的数据。
+                        </p>
+                    </div>
+                `;
+            }
+            
+            modal.classList.add('active');
+        }
+        
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+        
+        // 重新测试
+        function restartTest() {
+            showPage('welcomePage');
+        }
+        
+        // 点击弹窗外部关闭
+        document.getElementById('modalOverlay').addEventListener('click', (e) => {
+            if (e.target.id === 'modalOverlay') {
+                closeModal();
+            }
+        });
+        
+        // 初始化
+        displayQuestion();
+    </script>
+</body>
+</html>
